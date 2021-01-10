@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import "weather-icons/css/weather-icons.css";
+
+import "./App.css";
+import Weather from "./view/WeatherApp";
+
+const API_KEY = "1d6f5b6bf565fee9388b514ea5ffae55";
 
 function App() {
+  useEffect(() => {
+    getWeather();
+  }, []);
+
+  const getWeather = async () => {
+    const api_call = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=${API_KEY}`
+    );
+    const response = await api_call.json();
+    console.log(response);
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <Weather />
+      </div>
     </div>
   );
 }
