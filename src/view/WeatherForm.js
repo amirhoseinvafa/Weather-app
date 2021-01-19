@@ -1,33 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Alert } from "reactstrap";
+import { Button, Form } from "reactstrap";
 import { useForm } from "react-hook-form";
 
 import Weather from "view/WeatherApp";
+import WeatherApi from "api/WeatherApi";
+import { initialData } from "services/initialData/InitialData";
+import AlertApp from "component/AlertApp";
 
 const WeatherForm = () => {
-  const [formData, setFormData] = useState({ city: "London", country: "UK" });
-  const { register, errors, handleSubmit } = useForm();
-  const [visible, setVisible] = useState(true);
+  const { register, errors, handleSubmit, reset } = useForm();
+
+  const [formData, setFormData] = useState({ city: "", country: "" });
   const [isLoading, setIsLoading] = useState(false);
-  const [apiData, setApiData] = useState({
-    city: undefined,
-    country: undefined,
-    temp: undefined,
-    temp_max: undefined,
-    temp_min: undefined,
-    description: undefined,
-    cod: undefined,
-    icon: undefined,
-  });
+  const [apiData, setApiData] = useState(initialData);
+  //alert
+  const [inProp, setInProp] = useState(false);
 
-  const weatherApi = async (city, count) => {
+  useEffect(async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const API_call = await fetch(
-        `${process.env.REACT_APP_URL}/data/2.5/weather?q=${city},${count}&appid=${process.env.REACT_APP_API_KEY}`
-      );
-
-      const data = await API_call.json();
+      const data = await WeatherApi(formData.city, formData.country);
       setApiData({
         city: data.name,
         country: data.sys.country,
@@ -39,23 +31,20 @@ const WeatherForm = () => {
         icon: data.weather[0].id,
       });
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
     }
     setIsLoading(false);
-  };
-  useEffect(() => {
-    weatherApi(formData.city, formData.country);
   }, [formData]);
 
-  const onDismiss = () => setVisible(false);
-
+  const onSubmit = (data) => {
+    setFormData({ city: data.city, country: data.country });
+    reset();
+  };
   return (
     <>
       <div className="container">
         <Form
-          onSubmit={handleSubmit((data) =>
-            setFormData({ city: data.city, country: data.country })
-          )}
+          onSubmit={handleSubmit(onSubmit)}
           className=" d-md-flex justify-content-md-center flex-wrap"
         >
           <div className="d-flex justify-content-center">
@@ -84,6 +73,7 @@ const WeatherForm = () => {
               size="sm"
               type="submit"
               disabled={isLoading ? true : false}
+              onClick={() => setInProp(true)}
             >
               Get Weather
             </Button>
@@ -92,15 +82,16 @@ const WeatherForm = () => {
       </div>
       <div className="py-4 mb-4">
         {apiData.cod === 200 && (
-          <Weather data={apiData} isLoading={isLoading} />
+          <Weather
+            data={apiData}
+            isLoading={isLoading}
+            inProp={inProp}
+            formData={formData}
+          />
         )}
       </div>
-      <div className="fixed-bottom">
-        {errors.country && (
-          <Alert isOpen={visible} toggle={onDismiss} color="primary  ">
-            Country is required !
-          </Alert>
-        )}
+      <div>
+        {errors.country && <AlertApp content="Country is required !" />}
       </div>
     </>
   );

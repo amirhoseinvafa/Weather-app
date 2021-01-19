@@ -1,9 +1,12 @@
 @import "weather-icons/css/weather-icons.css";
 
 .App {
-  height: 100vh;
-  background-image: url("./assets/4.jpg");
+  min-height: 100vh;
+  background-image: url("./assets/2.jpg");
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .inputs,
@@ -32,4 +35,11 @@ h5 {
 sub {
   font-size: 15px;
   color: rgb(255, 0, 0);
+}
+
+.max-temp {
+  color: rgb(241, 132, 132);
+}
+.min-temp {
+  color: rgb(89, 180, 255);
 }
