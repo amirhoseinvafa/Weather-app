@@ -1,10 +1,10 @@
 import "./App.css";
-import WeatherForm from "./view/WeatherForm";
+import WeatherApp from "./view/WeatherApp";
 
 function App() {
   return (
     <div className="App">
-      <WeatherForm />
+      <WeatherApp />
     </div>
   );
 }

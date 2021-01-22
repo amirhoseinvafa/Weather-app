@@ -2,11 +2,13 @@
 
 .App {
   min-height: 100vh;
-  background-image: url("./assets/2.jpg");
+  /* background-image: url("./assets/2.jpg"); */
+  background-image: url("https://picsum.photos/1200/800/?blur=");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+  padding-top: 5px;
 }
 
 .inputs,
@@ -16,12 +18,21 @@
   box-shadow: none !important;
   border-radius: 0;
   outline: none;
-  border-bottom: 2px solid whitesmoke !important;
-  color: rgb(255, 255, 255) !important;
+  border-bottom: 2px solid #f5f5f5 !important;
+  color: #ffffff !important;
+}
+.inputs:focus {
+  background-color: rgba(0, 0, 0, 0.068) !important;
+  padding-top: 5px !important;
 }
 ::placeholder {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: #ffffffb3 !important;
   opacity: 0.7 !important;
+}
+
+.box {
+  background-color: #00000066;
+  border-radius: 15px;
 }
 
 h1,
@@ -29,17 +40,17 @@ h2,
 h3,
 h4,
 h5 {
-  text-shadow: 1px 1px rgba(0, 0, 0, 0.63);
+  text-shadow: 1px 1px #000000a1;
 }
 
 sub {
   font-size: 15px;
-  color: rgb(255, 0, 0);
+  color: #ff0000;
 }
 
 .max-temp {
-  color: rgb(241, 132, 132);
+  color: #f18484;
 }
 .min-temp {
-  color: rgb(89, 180, 255);
+  color: #59b4ff;
 }

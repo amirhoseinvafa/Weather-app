@@ -1,66 +1,103 @@
 import React, { useEffect, useState } from "react";
-import { Spinner } from "reactstrap";
-import { getWeatherIcon } from "services/GetWeatherIcon";
-import { Transition } from "react-transition-group";
-import {
-  duration,
-  defaultStyle,
-  transitionStyles,
-} from "services/initialData/InitialData";
-const Weather = ({ data, isLoading, formData, inProp }) => {
-  const [weatherIcon, setWeatherIcon] = useState();
+import { Button, Form } from "reactstrap";
+import { useForm } from "react-hook-form";
+
+import WeatherData from "view/WeatherData";
+import WeatherApi from "api/WeatherApi";
+import { initialData } from "services/initialData/InitialData";
+import AlertApp from "component/AlertApp";
+
+const WeatherForm = () => {
+  const { register, errors, handleSubmit, reset } = useForm();
+
+  const [formData, setFormData] = useState({ city: "", country: "" });
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiData, setApiData] = useState(initialData);
+  const [inProp, setInProp] = useState(false);
 
   useEffect(() => {
-    setWeatherIcon(getWeatherIcon(data.icon));
-  }, [data.icon]);
+    callApi();
+  }, [formData]);
+
+  const callApi = async () => {
+    setIsLoading(true);
+    try {
+      const data = await WeatherApi(formData.city, formData.country);
+      setApiData({
+        city: data.name,
+        country: data.sys.country,
+        temp: Math.floor(data.main.temp - 273),
+        temp_max: Math.floor(data.main.temp_max - 273),
+        temp_min: Math.floor(data.main.temp_min - 273),
+        description: data.weather[0].description,
+        cod: data.cod,
+        icon: data.weather[0].id,
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+    setIsLoading(false);
+  };
+
+  const onSubmit = (data) => {
+    setFormData({ city: data.city, country: data.country });
+    reset();
+  };
   return (
     <>
-      {isLoading ? (
-        <div className="d-flex justify-content-center  pt-3">
-          <Spinner
-            style={{ width: "1.5rem", height: "1.5rem" }}
-            color="light"
-          />
-        </div>
-      ) : (
-        <Transition in={inProp} timeout={duration}>
-          {(state) => (
-            <div
-              style={{
-                ...defaultStyle,
-                ...transitionStyles[state],
-              }}
+      <div className="container">
+        <Form
+          onSubmit={handleSubmit(onSubmit)}
+          className=" d-md-flex justify-content-md-center flex-wrap"
+        >
+          <div className="d-flex justify-content-center">
+            <input
+              ref={register}
+              type="text"
+              name="city"
+              placeholder="London"
+              className="inputs"
+              autoComplete="off"
+            />
+          </div>
+          <div className="d-flex justify-content-center my-md-0 mx-md-3 my-2">
+            <input
+              ref={register({ required: true })}
+              type="text"
+              name="country"
+              placeholder="GB"
+              className="inputs"
+              autoComplete="off"
+            />
+          </div>
+          <div className="d-flex justify-content-center pt-3">
+            <Button
+              color="info"
+              size="sm"
+              type="submit"
+              disabled={isLoading ? true : false}
+              onClick={() => setInProp(true)}
             >
-              <div className="d-flex justify-content-center">
-                <div>
-                  <h1 className="text-white text-center">
-                    {formData.city !== "" && `${data.city} ,`} {data.country}
-                  </h1>
-                  <h5 className="py-4 text-white text-center">
-                    <i className={`wi ${weatherIcon} display-2`}></i>
-                  </h5>
-                  <h1 className="text-center text-white font-weight-bold">
-                    {data.temp}&deg;
-                  </h1>
-                  <div className="d-flex justify-content-around">
-                    <h4 className="text-center  font-weight-bold max-temp">
-                      {data.temp_max}&deg;
-                    </h4>
-                    <h4 className="text-center  font-weight-bold min-temp">
-                      {data.temp_min}&deg;
-                    </h4>
-                  </div>
-                  <h3 className="text-white text-center pt-3">
-                    {data.description}
-                  </h3>
-                </div>
-              </div>
-            </div>
-          )}
-        </Transition>
-      )}
+              Get Weather
+            </Button>
+          </div>
+        </Form>
+      </div>
+      <div className="py-4 mb-4">
+        {apiData.cod === 200 && (
+          <WeatherData
+            data={apiData}
+            isLoading={isLoading}
+            inProp={inProp}
+            formData={formData}
+          />
+        )}
+      </div>
+      <div>
+        {errors.country && <AlertApp content="Country is required !" />}
+      </div>
     </>
   );
 };
 
-export default Weather;
+export default WeatherForm;
